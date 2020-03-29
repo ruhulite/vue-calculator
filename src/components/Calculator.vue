@@ -3,23 +3,23 @@
     <div class="display">{{ current || '0' }}</div>
     <div @click="clear" class="btn cancel">C</div>
     <div @click="sign" class="btn ">+/-</div>
-    <div class="btn ">%</div>
-    <div class="btn operator">/</div>
-    <div class="btn ">7</div>
-    <div class="btn ">8</div>
-    <div class="btn ">9</div>
-    <div class="btn star operator">*</div>
-    <div class="btn ">4</div>
-    <div class="btn ">5</div>
-    <div class="btn ">6</div>
-    <div class="btn minus operator">-</div>
-    <div class="btn ">1</div>
-    <div class="btn ">2</div>
-    <div class="btn ">3</div>
-    <div class="btn plus operator">+</div>
-    <div class="btn zero">0</div>
-    <div class="btn dot">.</div>
-    <div class="btn equal operator">=</div>
+    <div @click="percent" class="btn ">%</div>
+    <div @click="devide" class="btn operator">/</div>
+    <div @click="append('7')" class="btn ">7</div>
+    <div @click="append('8')" class="btn ">8</div>
+    <div @click="append('9')" class="btn ">9</div>
+    <div @click="star" class="btn star operator">*</div>
+    <div @click="append('4')" class="btn ">4</div>
+    <div @click="append('5')" class="btn ">5</div>
+    <div @click="append('6')" class="btn ">6</div>
+    <div @click="minus" class="btn minus operator">-</div>
+    <div @click="append('1')" class="btn ">1</div>
+    <div @click="append('2')" class="btn ">2</div>
+    <div @click="append('3')" class="btn ">3</div>
+    <div @click="plus" class="btn plus operator">+</div>
+    <div @click="append('0')" class="btn zero">0</div>
+    <div @click="dot" class="btn dot">.</div>
+    <div @click="equal" class="btn equal operator">=</div>
   </div>
 </template>
 
@@ -27,7 +27,10 @@
   export default {
     data() {
       return {
-        current: '-1212',
+        current: '',
+        operator: null,
+        previous: null,
+        operatorEvent: false,
       }
     },
     methods: {
@@ -35,8 +38,47 @@
         this.current = '';
       },
       sign() {
-        this.current = this.current.charAt(0) === '-' ? this.current.slice(0) : `-${this.current}`
-      }
+        this.current = this.current.charAt(0) === '-' ? this.current.slice(1) : `-${this.current}`
+      },
+      percent() {
+        this.current = `${parseFloat(this.current) / 100}`;
+      },
+      append(number) {
+        if(this.operatorEvent) {
+          this.current = '';
+          this.operatorEvent = false;
+        }
+        this.current = `${this.current}${number}`;
+      },
+      setPrevious() {
+        this.previous = this.current;
+        this.operatorEvent = true;
+      },
+      plus() {
+        this.operator = (a, b) => a + b;
+        this.setPrevious();
+      },
+      minus() {
+        this.operator = (a, b) => a - b;
+        this.setPrevious();
+      },
+      star() {
+        this.operator = (a, b) => a * b;
+        this.setPrevious();
+      },
+      devide() {
+        this.operator = (a, b) => a / b;
+        this.setPrevious();
+      },
+      dot() {
+        if(this.current.indexOf('.') === -1) {
+          this.append('.');
+        }
+      },
+      equal() {
+        this.current = `${this.operator(parseFloat(this.current), parseFloat(this.previous))}`;
+        this.previous = null;
+      },
     }
   };
 </script>
